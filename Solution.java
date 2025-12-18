@@ -10,30 +10,17 @@ class Solution {
 
     private final class Cell {
         private final Set<Integer> possibilities;
-        private int row;
-        private int col;
 
-        public Cell(int row, int col) {
+        public Cell() {
             this.possibilities = new HashSet<>();
             for (int i = 1; i <= 9; i++) {
                 this.possibilities.add(i);
             }
-            this.row = row;
-            this.col = col;
-        }
-
-        public Cell(Cell anotherCell) {
-            this.possibilities = new HashSet<>();
-            this.possibilities.addAll(anotherCell.possibilities);
-            this.row = anotherCell.row;
-            this.col = anotherCell.col;
         }
 
         public void set(Cell anotherCell) {
             this.possibilities.clear();
             this.possibilities.addAll(anotherCell.possibilities);
-            this.row = anotherCell.row;
-            this.col = anotherCell.col;
         }
 
         public boolean isPossible() {
@@ -68,14 +55,6 @@ class Solution {
                 return 0;
             }
         }
-
-        public int getRow() {
-            return row;
-        }
-
-        public int getCol() {
-            return col;
-        }
     }
 
     private final class Board {
@@ -85,7 +64,7 @@ class Solution {
             rows = new Cell[9][9];
             for (int rowIndex = 0; rowIndex < 9; rowIndex++) {
                 for (int colIndex = 0; colIndex < 9; colIndex++) {
-                    rows[rowIndex][colIndex] = new Cell(rowIndex, colIndex);
+                    rows[rowIndex][colIndex] = new Cell();
                 }
             }
         }
@@ -201,6 +180,8 @@ class Solution {
             }
             int minPossibilitySize = 9;
             Cell minPossibleCell = null;
+            int minPossibleCellRow = 9;
+            int minPossibleCellCol = 9;
             for (int rowIndex = 0; rowIndex < 9; rowIndex++) {
                 for (int colIndex = 0; colIndex < 9; colIndex++) {
                     final Cell cell = getCell(rowIndex, colIndex);
@@ -210,6 +191,8 @@ class Solution {
                     final int possibilitySize = cell.getPossibilitySize();
                     if (possibilitySize < minPossibilitySize) {
                         minPossibleCell = cell;
+                        minPossibleCellRow = rowIndex;
+                        minPossibleCellCol = colIndex;
                         minPossibilitySize = possibilitySize;
                     }
                 }
@@ -218,7 +201,7 @@ class Solution {
                 final Set<Integer> possibilities = minPossibleCell.getPossibilities();
                 for (final int possibleNumber : possibilities) {
                     final Board trialBoard = new Board(this);
-                    trialBoard.setNumber(minPossibleCell.getRow(), minPossibleCell.getCol(), possibleNumber);
+                    trialBoard.setNumber(minPossibleCellRow, minPossibleCellCol, possibleNumber);
                     if (!trialBoard.isPossible()) {
                         continue;
                     }

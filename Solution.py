@@ -12,16 +12,12 @@ class Solution:
 
 class Cell:
 
-    def __init__(self, row: int, col: int):
+    def __init__(self):
         self.possibilities: set[int] = {1, 2, 3, 4, 5, 6, 7, 8, 9}
-        self.row: int = row
-        self.col: int = col
 
     def set(self, anotherCell: "Cell") -> None:
         self.possibilities = set()
         self.possibilities.update(anotherCell.possibilities)
-        self.row = anotherCell.row
-        self.col = anotherCell.col
 
     def isPossible(self) -> bool:
         return len(self.possibilities) != 0
@@ -47,12 +43,6 @@ class Cell:
         else:
             return 0
 
-    def getRow(self) -> int:
-        return self.row
-
-    def getCol(self) -> int:
-        return self.col
-
 
 class Board:
     rows: list[list[Cell]]
@@ -63,7 +53,7 @@ class Board:
         for rowIndex in range(9):
             row: list[Cell] = []
             for colIndex in range(9):
-                row.append(Cell(rowIndex, colIndex))
+                row.append(Cell())
             self.rows.append(row)
 
         if charBoard is not None:
@@ -135,6 +125,8 @@ class Board:
             return
         minPossibilitySize: int = 9
         minPossibleCell: Cell | None = None
+        minPossibleCellRow: int = 9
+        minPossibleCellCol: int = 9
         for rowIndex in range(9):
             for colIndex in range(9):
                 cell: Cell = self.getCell(rowIndex, colIndex)
@@ -143,12 +135,14 @@ class Board:
                 possibilitySize: int = cell.getPossibilitySize()
                 if possibilitySize < minPossibilitySize:
                     minPossibleCell = cell
+                    minPossibleCellRow = rowIndex
+                    minPossibleCellCol = colIndex
                     minPossibilitySize = possibilitySize
         if minPossibleCell is not None:
             possibilities: set[int] = minPossibleCell.getPossibilities()
             for possibleNumber in possibilities:
                 trialBoard: Board = Board(anotherBoard=self)
-                trialBoard.setNumber(minPossibleCell.getRow(), minPossibleCell.getCol(), possibleNumber)
+                trialBoard.setNumber(minPossibleCellRow, minPossibleCellCol, possibleNumber)
                 if not trialBoard.isPossible():
                     continue
                 trialBoard.solve()

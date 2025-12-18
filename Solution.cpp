@@ -13,31 +13,21 @@ private:
     class Cell {
     private:
         std::vector<int> possibilities;
-        int row;
-        int col;
 
     public:
-        Cell(int row, int col) {
+        Cell() {
             for (int i = 1; i <= 9; i++) {
                 possibilities.push_back(i);
             }
-            this->row = row;
-            this->col = col;
         }
-
-        Cell() : Cell(0, 0) {}
 
         Cell(const Cell &anotherCell) {
             possibilities.insert(possibilities.end(), anotherCell.possibilities.begin(), anotherCell.possibilities.end());
-            this->row = anotherCell.row;
-            this->col = anotherCell.col;
         }
 
         void set(const Cell &anotherCell) {
             possibilities.clear();
             possibilities.insert(possibilities.end(), anotherCell.possibilities.begin(), anotherCell.possibilities.end());
-            this->row = anotherCell.row;
-            this->col = anotherCell.col;
         }
 
         bool isPossible() const {
@@ -72,22 +62,6 @@ private:
                 return 0;
             }
         }
-
-        void setRow(const int row) {
-            this->row = row;
-        }
-
-        void setCol(const int col) {
-            this->col = col;
-        }
-
-        int getRow() const {
-            return row;
-        }
-
-        int getCol() const {
-            return col;
-        }
     };
 
     class Board {
@@ -99,8 +73,6 @@ private:
             for (int rowIndex = 0; rowIndex < 9; rowIndex++) {
                 for (int colIndex = 0; colIndex < 9; colIndex++) {
                     Cell &cell = rows[rowIndex][colIndex];
-                    cell.setRow(rowIndex);
-                    cell.setCol(colIndex);
                 }
             }
         }
@@ -220,6 +192,8 @@ private:
             }
             int minPossibilitySize = 9;
             Cell *minPossibleCell = nullptr;
+            int minPossibleCellRow = 9;
+            int minPossibleCellCol = 9;
             for (int rowIndex = 0; rowIndex < 9; rowIndex++) {
                 for (int colIndex = 0; colIndex < 9; colIndex++) {
                     Cell &cell = getCell(rowIndex, colIndex);
@@ -229,6 +203,8 @@ private:
                     const int possibilitySize = cell.getPossibilitySize();
                     if (possibilitySize < minPossibilitySize) {
                         minPossibleCell = &cell;
+                        minPossibleCellRow = rowIndex;
+                        minPossibleCellCol = colIndex;
                         minPossibilitySize = possibilitySize;
                     }
                 }
@@ -237,7 +213,7 @@ private:
                 const std::vector<int> &possibilities = minPossibleCell->getPossibilities();
                 for (const int possibleNumber : possibilities) {
                     Board trialBoard(*this);
-                    trialBoard.setNumber(minPossibleCell->getRow(), minPossibleCell->getCol(), possibleNumber);
+                    trialBoard.setNumber(minPossibleCellRow, minPossibleCellCol, possibleNumber);
                     if (!trialBoard.isPossible()) {
                         continue;
                     }
