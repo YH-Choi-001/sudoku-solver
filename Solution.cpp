@@ -12,52 +12,64 @@ public:
 private:
     class Cell {
     private:
-        std::vector<int> possibilities;
+        int possibilities;
 
     public:
-        Cell() {
+        Cell() : possibilities(0) {
             for (int i = 1; i <= 9; i++) {
-                possibilities.push_back(i);
+                possibilities |= (1 << i);
             }
         }
 
         Cell(const Cell &anotherCell) {
-            possibilities.insert(possibilities.end(), anotherCell.possibilities.begin(), anotherCell.possibilities.end());
+            possibilities = anotherCell.possibilities;
         }
 
         void set(const Cell &anotherCell) {
-            possibilities.clear();
-            possibilities.insert(possibilities.end(), anotherCell.possibilities.begin(), anotherCell.possibilities.end());
+            possibilities = anotherCell.possibilities;
         }
 
         bool isPossible() const {
-            return !possibilities.empty();
+            return possibilities != 0;
         }
 
         bool isDeterministic() const {
-            return possibilities.size() == 1;
+            return (possibilities & (possibilities - 1)) == 0;
         }
 
         int getPossibilitySize() const {
-            return possibilities.size();
+            int size = 0;
+            int p = possibilities;
+            while (p != 0) {
+                if (p & 0x01) {
+                    ++size;
+                }
+                p >>= 1;
+            }
+            return size;
         }
 
-        const std::vector<int> &getPossibilities() const {
-            return possibilities;
+        std::vector<int> getPossibilities() const {
+            std::vector<int> numbers;
+            for (int num = 0, p = possibilities; p != 0; num++, p >>= 1) {
+                if (p & 0x01) {
+                    numbers.push_back(num);
+                }
+            }
+            return numbers;
         }
 
         void removePossibleNumber(int num) {
-            possibilities.erase(std::remove(possibilities.begin(), possibilities.end(), num), possibilities.end());
+            possibilities &= ~(1 << num);
         }
 
         void setNumber(int num) {
-            possibilities.clear();
-            possibilities.push_back(num);
+            possibilities = (1 << num);
         }
 
         int getNumber() const {
             if (isDeterministic()) {
-                return possibilities[0];
+                return getPossibilities()[0];
             } else {
                 return 0;
             }
